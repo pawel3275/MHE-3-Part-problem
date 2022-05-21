@@ -5,9 +5,9 @@
 #include "header/Tabu.h"
 #include "header/Anealling.h"
 #include "header/HillClimb.h"
+#include "header/Genetic.h"
 
 using namespace std;
-
 void print_help()
 {
 	cout << "Invalid command line - required: [max_iterations] [input_file_path]" << endl;
@@ -42,6 +42,7 @@ int main(int argc, char** argv)
 	// Define the algorithms
 	Anealling annealing_alg = Anealling();
 	HillClimb hill_alg = HillClimb();
+	Genetic genetic_alg = Genetic();
 	Tabu tabu_alg = Tabu();
 
 	// Check if the provided input was valid
@@ -49,16 +50,25 @@ int main(int argc, char** argv)
 	{
 		// Iterate 5 times (to gather more statistics).
 		// Comment out later
-		for (int i = 0; i < 5; i++)
-		{
-			cout << "############### ITERATION: " << i << " ###############" << endl;
-			vector<vector<int>> triplets = ThreePartProb::get_triplets(numbers);
-			annealing_alg.simulated_annealing(max_iteration, triplets);
-			hill_alg.hill_climb_deterministic(max_iteration, triplets);
-			hill_alg.hill_climb_stochastic(max_iteration, triplets);
-			tabu_alg.tabu_search(max_iteration, triplets);
-			cout << "############################################" << endl << endl;
-		}
+		//for (int i = 0; i < 5; i++)
+		//{
+		//	cout << "############### ITERATION: " << i << " ###############" << endl;
+		//	vector<vector<int>> triplets = ThreePartProb::get_triplets(numbers);
+		//	annealing_alg.simulated_annealing(max_iteration, triplets);
+		//	hill_alg.hill_climb_deterministic(max_iteration, triplets);
+		//	hill_alg.hill_climb_stochastic(max_iteration, triplets);
+		//	tabu_alg.tabu_search(max_iteration, triplets);
+		//	cout << "############################################" << endl << endl;
+		//}
+		vector<vector<int>> triplets = ThreePartProb::get_triplets(numbers);
+		genetic_alg.run_genetic_algorithm(max_iteration, 
+			100, 
+			Genetic::mutation::one_point, 
+			1.1, 
+			Genetic::crossover::single,
+			1.1,
+			Genetic::selection::tournament,
+			triplets);
 	}
 	else
 	{

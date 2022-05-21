@@ -5,6 +5,9 @@ static ULARGE_INTEGER lastCPU, lastSysCPU, lastUserCPU;
 static int numProcessors;
 static HANDLE self;
 
+random_device device;
+mt19937 random_num(device());
+
 vector<vector<vector<int>>> ThreePartProb::generate_neighbours(vector<vector<int>> triplets)
 {
 	vector<vector<vector<int>>> neighbours;
@@ -142,17 +145,12 @@ vector<int> ThreePartProb::load_numbers_from_file(string path)
 
 int ThreePartProb::get_rand_int(int start, int end)
 {
-	random_device device;
-	mt19937 random_num(device());
-
 	uniform_int_distribution<int> rand_int = uniform_int_distribution<int>(start, end);
 	return rand_int(random_num);
 }
 
 double ThreePartProb::get_rand_double(double start, double end)
 {
-	random_device device;
-	mt19937 random_num(device());
 	uniform_real_distribution<> random_distribution(start, end);
 
 	return random_distribution(device);
