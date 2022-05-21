@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="header\Anealling.h" />
+    <ClInclude Include="header\Genetic.h" />
     <ClInclude Include="header\HillClimb.h" />
     <ClInclude Include="header\Tabu.h" />
     <ClInclude Include="header\ThreePartProb.h" />
@@ -147,9 +148,11 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="source\Anealling.cpp" />
+    <ClCompile Include="source\Genetic.cpp" />
     <ClCompile Include="source\HillClimb.cpp" />
     <ClCompile Include="source\Tabu.cpp" />
     <ClCompile Include="source\ThreePartProb.cpp" />
+    <ClCompile Include="Trash.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
