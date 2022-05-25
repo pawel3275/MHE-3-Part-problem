@@ -213,21 +213,29 @@ void Genetic::run_genetic_algorithm(unsigned int max_iterations,
     selection selection,
     const vector<vector<int>> triplets)
 {
+    // store errors to measure them
+    vector <double> errors;
     // vector containing error values
     vector<double> fitnesses;
     
-    // Already shuffled population
+    // Generate already shuffled population
     vector<vector<vector<int>>> init_population = generate_population(population, triplets);
 
     // Iterate over each triplet and see what error do we get and push it back to fitness
     for (auto& specimen : init_population) fitnesses.push_back(get_error(specimen));
-    cout << "Lowest error = " << *min_element(fitnesses.begin(), fitnesses.end()) << endl;
-    int lowest_error = *min_element(fitnesses.begin(), fitnesses.end());
-    int lowest_error_index = getIndex(fitnesses, lowest_error);
+
+    // Check the lowest error for initial population and push it back
+    errors.push_back(*min_element(fitnesses.begin(), fitnesses.end()));
+    
+    auto start = chrono::system_clock::now();
     for (unsigned int i = 0; i < max_iterations; i++)
     {
         // no need for loop for parents, function has loop inside
         vector<vector<vector<int>>> parents;
+        // define the new generation
+        vector<vector<vector<int>>> offspring;
+
+        // Choose the selection algorithm
         switch (selection)
         {
         case elite:
@@ -237,7 +245,6 @@ void Genetic::run_genetic_algorithm(unsigned int max_iterations,
             break;
         }
         
-        vector<vector<vector<int>>> offspring;
         for (unsigned int i = 0; i < parents.size(); i += 2) 
         {
             // crossover will cross the triplets according to the first parent
@@ -245,19 +252,21 @@ void Genetic::run_genetic_algorithm(unsigned int max_iterations,
             switch (crossover)
             {
             case single:
+                // In single we split the vector {1, 2, 3, 4, 5} and cross it with 
+                // second vector {3, 4, 5, 6, 7}, producing {1, 2, 3, 4, 6, 7}
                 offspring.push_back(crossover_single(parents[i], parents[i + 1], crossover_prob));
                 offspring.push_back(crossover_single(parents[i + 1], parents[i], crossover_prob));
                 break;
             case multiple:
+                // in multiple we shuffle two vectors by taking every second element.
                 offspring.push_back(crossover_multiple(parents[i], parents[i + 1], crossover_prob));
                 offspring.push_back(crossover_multiple(parents[i + 1], parents[i], crossover_prob));
                 break;
             default:
                 break;
             }
-
         }
-        
+
         for (unsigned int i = 0; i < parents.size(); i++)
         {
             switch (mutation)
@@ -273,29 +282,21 @@ void Genetic::run_genetic_algorithm(unsigned int max_iterations,
             }
         }
         
-        fitnesses.clear();
-        for (auto& specimen : offspring) fitnesses.push_back(get_error(specimen));
-        int error = *min_element(fitnesses.begin(), fitnesses.end());
-        if (error < lowest_error)
-        {
-            init_population = offspring;
-            lowest_error = error;
-            lowest_error_index = getIndex(fitnesses, lowest_error);
-            cout << "Lowest error = " << *min_element(fitnesses.begin(), fitnesses.end()) << endl;
-            if (lowest_error == 0)
-            {
-                cout << "Praise the lord!";
-                break;
-            }
-        }
+        init_population = offspring;
+
+        //fitnesses.clear();
+        //for (auto& specimen : offspring) fitnesses.push_back(get_error(specimen));
+        //errors.push_back(*min_element(fitnesses.begin(), fitnesses.end()));
     }
+    auto finish = chrono::system_clock::now();
+    chrono::duration<double> time_taken = finish - start;
+
+
+    auto it = find(errors.begin(), errors.end(), *min_element(errors.begin(), errors.end()));
+    int lowest_error_index = it - errors.begin();
     vector<vector<int>> best_triplet = init_population[lowest_error_index];
     
-    for (unsigned int i = 0; i < init_population.size(); i++)
-    {
-        vector<vector<int>> random_point_a = init_population[i];
-        cout << get_error(random_point_a) << endl;
-    }
-
-    //return population;
+    string algorithm_used = "GENETIC " + to_string(population) + " " + to_string(mutation) + " " + to_string(mutation_prob) + " " + to_string(crossover) + " " + to_string(crossover_prob) + " " + to_string(selection);
+    print_best_triplet(best_triplet, algorithm_used, time_taken, get_error(best_triplet));
+    gather_statistics_to_file(algorithm_used, time_taken, get_error(best_triplet), errors, max_iterations, triplets.size());
 }

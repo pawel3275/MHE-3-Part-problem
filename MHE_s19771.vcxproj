@@ -152,7 +152,6 @@
     <ClCompile Include="source\HillClimb.cpp" />
     <ClCompile Include="source\Tabu.cpp" />
     <ClCompile Include="source\ThreePartProb.cpp" />
-    <ClCompile Include="Trash.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

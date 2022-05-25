@@ -108,7 +108,7 @@ void ThreePartProb::gather_statistics_to_file(
 
 	ofstream csv_file;
 	string gathered_error_values;
-	string delimeter = ";";
+	string delimeter = ",";
 	for (int i = 0; i < error_values.size(); i++)
 	{
 		string error = to_string(int(error_values[i]));
