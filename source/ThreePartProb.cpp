@@ -114,7 +114,7 @@ void ThreePartProb::gather_statistics_to_file(
 		string error = to_string(int(error_values[i]));
 		gathered_error_values += error + " ";
 	}
-	csv_file.open("statistics.csv", ios::app);
+	csv_file.open("statistics_4_prob 1.0 to 0.1.csv", ios::app);
 	csv_file << algorithm << delimeter << max_iterations << delimeter << time.count() << delimeter << problem_size * 3 \
 		<< delimeter << error << delimeter << gathered_error_values << delimeter << virtualMemUsedByMe \
 		<< delimeter << physMemUsedByMe << delimeter << endl;

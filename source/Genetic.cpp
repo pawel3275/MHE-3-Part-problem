@@ -73,11 +73,12 @@ vector<vector<vector<int>>> Genetic::selection_elite(vector<vector<vector<int>>>
     // Obtain only the best speciment. If the fitness equals less then average
     // push them to vector and return only those whose fitness is below average.
     vector<vector<vector<int>>> ret;
-    for (unsigned int i = 0; i < population.size(); i++)
+    while (ret.size() != population.size())
     {
-        if (get_error(population[i]) < average)
+        int rand_int = get_rand_int(0, population.size() - 1);
+        if (get_error(population[rand_int]) <= average)
         {
-            ret.push_back(population[i]);
+            ret.push_back(population[rand_int]);
         }
     }
     return ret;
@@ -215,6 +216,7 @@ void Genetic::run_genetic_algorithm(unsigned int max_iterations,
 {
     // store errors to measure them
     vector <double> errors;
+    vector <double> stats_errors;
     // vector containing error values
     vector<double> fitnesses;
     
@@ -235,17 +237,19 @@ void Genetic::run_genetic_algorithm(unsigned int max_iterations,
         // define the new generation
         vector<vector<vector<int>>> offspring;
 
-        // Choose the selection algorithm
+        // selection
         switch (selection)
         {
         case elite:
             parents = selection_elite(init_population, getAverage(fitnesses));
+            break;
         default:
             parents = selection_tournament(init_population);
             break;
         }
         
-        for (unsigned int i = 0; i < parents.size(); i += 2) 
+        // crossover
+        for (int i = 0; i < parents.size(); i += 2) 
         {
             // crossover will cross the triplets according to the first parent
             // second parent is subsetted
@@ -267,6 +271,7 @@ void Genetic::run_genetic_algorithm(unsigned int max_iterations,
             }
         }
 
+        // mutation
         for (unsigned int i = 0; i < parents.size(); i++)
         {
             switch (mutation)
@@ -284,9 +289,16 @@ void Genetic::run_genetic_algorithm(unsigned int max_iterations,
         
         init_population = offspring;
 
-        //fitnesses.clear();
-        //for (auto& specimen : offspring) fitnesses.push_back(get_error(specimen));
+        // for elite selection
+        if (selection == 1)
+        {
+            fitnesses.clear();
+            for (auto& specimen : offspring) fitnesses.push_back(get_error(specimen));
+        }
+
+        // gather statistics
         //errors.push_back(*min_element(fitnesses.begin(), fitnesses.end()));
+        stats_errors.push_back(*min_element(fitnesses.begin(), fitnesses.end()));
     }
     auto finish = chrono::system_clock::now();
     chrono::duration<double> time_taken = finish - start;
@@ -298,5 +310,5 @@ void Genetic::run_genetic_algorithm(unsigned int max_iterations,
     
     string algorithm_used = "GENETIC " + to_string(population) + " " + to_string(mutation) + " " + to_string(mutation_prob) + " " + to_string(crossover) + " " + to_string(crossover_prob) + " " + to_string(selection);
     print_best_triplet(best_triplet, algorithm_used, time_taken, get_error(best_triplet));
-    gather_statistics_to_file(algorithm_used, time_taken, get_error(best_triplet), errors, max_iterations, triplets.size());
+    gather_statistics_to_file(algorithm_used, time_taken, get_error(best_triplet), stats_errors, max_iterations, triplets.size());
 }
